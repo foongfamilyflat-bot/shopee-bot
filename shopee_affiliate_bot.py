@@ -6,7 +6,6 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 AFFILIATE_ID = os.environ.get("AFFILIATE_ID")
-BITLY_TOKEN = os.environ.get("BITLY_TOKEN")
 NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 
@@ -52,20 +51,6 @@ TAG_MAP = {
     "sale": "sale",
     "voucher": "voucher",
 }
-
-def shorten_url(long_url):
-    try:
-        response = requests.post(
-            "https://api-ssl.bitly.com/v4/shorten",
-            headers={"Authorization": f"Bearer {BITLY_TOKEN}", "Content-Type": "application/json"},
-            json={"long_url": long_url},
-            timeout=10
-        )
-        if response.status_code in [200, 201]:
-            return response.json().get("link", long_url)
-    except Exception as e:
-        logger.error(f"Shortener error: {e}")
-    return long_url
 
 def convert_to_affiliate_link(original_url):
     original_url = original_url.strip()
@@ -145,22 +130,45 @@ def format_results(results):
 
 async def start(update, context):
     await update.message.reply_text(
-        "Welcome! Here's how to use this bot \U0001f447\n\n"
-        "*\U0001f50d Browse by category or keyword:*\n"
-        "`home` \u00b7 `kitchen` \u00b7 `fitness` \u00b7 `beauty` \u00b7 `fashion` \u00b7 `daily life` \u00b7 `groceries` \u00b7 `travel` \u00b7 `content creation` \u00b7 `cats` \u00b7 `games`\n\n"
-        "These are just ideas \u2014 feel free to type anything you're looking for!\n\n"
-        "*\U0001f517 Convert a Shopee link:*\n"
-        "Paste any Shopee URL and I'll generate a fff link for you\n\n"
-        "Try it now! \U0001f6cd\ufe0f",
+        "Welcome! Here's how to use this bot 👇
+
+"
+        "*🔍 Browse by category or keyword:*
+"
+        "`home` · `kitchen` · `fitness` · `beauty` · `fashion` · `daily life` · `groceries` · `travel` · `content creation` · `cats` · `games`
+
+"
+        "These are just ideas — feel free to type anything you're looking for!
+
+"
+        "🏷️ On sale days, type `voucher` to get the latest voucher links!
+
+"
+        "*🔗 Convert a Shopee link:*
+"
+        "Paste any Shopee URL and I'll generate a fff link for you
+
+"
+        "Try it now! 🛍️",
         parse_mode="Markdown"
     )
 
 async def help_command(update, context):
     await update.message.reply_text(
-        "*Quick reference* \U0001f447\n\n"
-        "*\U0001f50d Browse:* Type a category or keyword\n"
-        "`home` \u00b7 `kitchen` \u00b7 `fitness` \u00b7 `beauty` \u00b7 `fashion` \u00b7 `daily life` \u00b7 `groceries` \u00b7 `travel` \u00b7 `content creation` \u00b7 `cats` \u00b7 `games`\n\n"
-        "*\U0001f517 Convert:* Paste any Shopee URL to get a fff link\n\n"
+        "*Quick reference* 👇
+
+"
+        "*🔍 Browse:* Type a category or keyword
+"
+        "`home` · `kitchen` · `fitness` · `beauty` · `fashion` · `daily life` · `groceries` · `travel` · `content creation` · `cats` · `games`
+
+"
+        "🏷️ On sale days, type `voucher` to get the latest voucher links!
+
+"
+        "*🔗 Convert:* Paste any Shopee URL to get a fff link
+
+"
         "Can't find what you're looking for? Try a different keyword!",
         parse_mode="Markdown"
     )
@@ -170,16 +178,24 @@ async def handle_message(update, context):
     if "http" in text and "shopee.sg" in text:
         link = convert_to_affiliate_link(text)
         if link:
-            await update.message.reply_text(f"Here is your link:\n\n{link}\n\nHappy shopping! \U0001f6cd\ufe0f")
+            await update.message.reply_text(f"Here is your link:
+
+{link}
+
+Happy shopping! 🛍️")
         else:
             await update.message.reply_text("That does not look like a Shopee link! Make sure it contains shopee.sg and try again.")
         return
-    await update.message.reply_text("\U0001f50d Searching the link library...")
+    await update.message.reply_text("🔍 Searching the link library...")
     results = search_notion(text)
     formatted = format_results(results)
     if formatted:
         await update.message.reply_text(
-            f"Here is what I found for *{text}*:\n\n{formatted}\n\nType another keyword to search more! \U0001f6cd\ufe0f",
+            f"Here is what I found for *{text}*:
+
+{formatted}
+
+Type another keyword to search more! 🛍️",
             parse_mode="Markdown"
         )
     else:
