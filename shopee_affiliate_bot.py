@@ -24,14 +24,31 @@ CATEGORY_MAP = {
     "skincare": "04 Beauty & Wellness",
     "fashion": "05 Fashion",
     "lifestyle": "05 Fashion",
+    "daily life": "06 Daily life",
     "daily": "06 Daily life",
     "groceries": "07 Groceries & Food",
     "food": "07 Groceries & Food",
     "travel": "08 Travel",
+    "content creation": "09 Content Creation",
     "content": "09 Content Creation",
     "cats": "10 Cats",
     "games": "11 Board & Card Games",
     "board": "11 Board & Card Games",
+}
+
+TAG_MAP = {
+    "gift idea": "gift idea",
+    "under $20": "under $20",
+    "under $50": "under $50",
+    "favourite": "favourite",
+    "favorite": "favourite",
+    "bestseller": "bestseller",
+    "tried & tested": "tried & tested",
+    "new find": "new find",
+    "non-toxic": "non-toxic",
+    "cat-safe": "cat-safe",
+    "currently using": "currently using",
+    "hot weather approved": "hot weather approved",
 }
 
 def shorten_url(long_url):
@@ -64,12 +81,23 @@ def search_notion(query):
         "Notion-Version": "2022-06-28"
     }
     category = CATEGORY_MAP.get(query.lower())
+    tag = TAG_MAP.get(query.lower())
     if category:
         data = {
             "filter": {
                 "and": [
                     {"property": "Active", "checkbox": {"equals": True}},
                     {"property": "Category", "select": {"equals": category}}
+                ]
+            },
+            "page_size": 5
+        }
+    elif tag:
+        data = {
+            "filter": {
+                "and": [
+                    {"property": "Active", "checkbox": {"equals": True}},
+                    {"property": "Tags", "multi_select": {"contains": tag}}
                 ]
             },
             "page_size": 5
@@ -107,28 +135,34 @@ def format_results(results):
         notes = props.get("Notes", {}).get("rich_text", [{}])
         notes = notes[0].get("plain_text", "") if notes else ""
         if link:
-            line = f"{name}"
+            line = f"*{name}*"
             if notes:
-                line += f" - {notes}"
-            line += f" {link}"
+                line += f"\n_{notes}_"
+            line += f"\n{link}"
             lines.append(line)
     return "\n\n".join(lines)
 
 async def start(update, context):
     await update.message.reply_text(
-        "Welcome! Here is how to use this bot\n\n"
-        "Search by category - type home, beauty, cats, kitchen, fitness, fashion, groceries, or games\n\n"
-        "Search by keyword - type any product like air fryer, moisturiser, dumbbells\n\n"
-        "Convert a Shopee link - paste any Shopee product URL and I will generate a short link for you\n\n"
-        "Try typing a category or keyword now! 🛍️"
+        "Welcome! Here's how to use this bot \U0001f447\n\n"
+        "*\U0001f50d Browse by category or keyword:*\n"
+        "`home` \u00b7 `kitchen` \u00b7 `fitness` \u00b7 `beauty` \u00b7 `fashion` \u00b7 `daily life` \u00b7 `groceries` \u00b7 `travel` \u00b7 `content creation` \u00b7 `cats` \u00b7 `games`\n\n"
+        "These are just ideas \u2014 feel free to type anything you're looking for!\n\n"
+        "*\U0001f517 Convert a Shopee link:*\n"
+        "Paste any Shopee URL and I'll generate a fff link for you\n\n"
+        "Try it now! \U0001f6cd\ufe0f",
+        parse_mode="Markdown"
     )
 
 async def help_command(update, context):
     await update.message.reply_text(
-        "How to use this bot:\n\n"
-        "Search by category - type home, beauty, cats, kitchen, fitness, fashion, groceries, or games\n\n"
-        "Search by keyword - type any product like air fryer, moisturiser, dumbbells\n\n"
-        "Convert a Shopee link - paste any Shopee product URL and I will generate a short link for you"
+        "*How to use this bot:*\n\n"
+        "*\U0001f50d Browse by category or keyword:*\n"
+        "`home` \u00b7 `kitchen` \u00b7 `fitness` \u00b7 `beauty` \u00b7 `fashion` \u00b7 `daily life` \u00b7 `groceries` \u00b7 `travel` \u00b7 `content creation` \u00b7 `cats` \u00b7 `games`\n\n"
+        "These are just ideas \u2014 feel free to type anything you're looking for!\n\n"
+        "*\U0001f517 Convert a Shopee link:*\n"
+        "Paste any Shopee URL and I'll generate a fff link for you",
+        parse_mode="Markdown"
     )
 
 async def handle_message(update, context):
@@ -136,17 +170,23 @@ async def handle_message(update, context):
     if "http" in text and "shopee.sg" in text:
         link = convert_to_affiliate_link(text)
         if link:
-            await update.message.reply_text(f"Here is your link: {link} Happy shopping!")
+            await update.message.reply_text(f"Here is your link:\n\n{link}\n\nHappy shopping! \U0001f6cd\ufe0f")
         else:
             await update.message.reply_text("That does not look like a Shopee link! Make sure it contains shopee.sg and try again.")
         return
-    await update.message.reply_text("Searching the link library...")
+    await update.message.reply_text("\U0001f50d Searching the link library...")
     results = search_notion(text)
     formatted = format_results(results)
     if formatted:
-        await update.message.reply_text(f"Here is what I found for {text}:\n\n{formatted}\n\nType another keyword to search more!")
+        await update.message.reply_text(
+            f"Here is what I found for *{text}*:\n\n{formatted}\n\nType another keyword to search more! \U0001f6cd\ufe0f",
+            parse_mode="Markdown"
+        )
     else:
-        await update.message.reply_text(f"No results found for {text}. Try a different keyword or category like home, beauty, cats, kitchen!")
+        await update.message.reply_text(
+            f"No results found for *{text}*. Try a different keyword or category like `home`, `beauty`, `cats`, `kitchen`!",
+            parse_mode="Markdown"
+        )
 
 app = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 app.add_handler(CommandHandler("start", start))
