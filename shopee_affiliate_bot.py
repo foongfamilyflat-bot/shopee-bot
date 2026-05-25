@@ -115,10 +115,21 @@ def format_results(results):
     return "\n\n".join(lines)
 
 async def start(update, context):
-    await update.message.reply_text("Hi! Paste any Shopee link to get a short link, or type a category like skincare, home, cats, kitchen to browse recommendations. Happy shopping!")
+    await update.message.reply_text(
+        "Welcome! Here is how to use this bot\n\n"
+        "Search by category - type home, beauty, cats, kitchen, fitness, fashion, groceries, or games\n\n"
+        "Search by keyword - type any product like air fryer, moisturiser, dumbbells\n\n"
+        "Convert a Shopee link - paste any Shopee product URL and I will generate a short link for you\n\n"
+        "Try typing a category or keyword now! 🛍️"
+    )
 
 async def help_command(update, context):
-    await update.message.reply_text("How to use: 1. Convert a link: Paste any Shopee product URL. 2. Browse by category: Type home, beauty, cats, kitchen, fashion, fitness, groceries, games. 3. Search: Type any keyword like air fryer or skincare.")
+    await update.message.reply_text(
+        "How to use this bot:\n\n"
+        "Search by category - type home, beauty, cats, kitchen, fitness, fashion, groceries, or games\n\n"
+        "Search by keyword - type any product like air fryer, moisturiser, dumbbells\n\n"
+        "Convert a Shopee link - paste any Shopee product URL and I will generate a short link for you"
+    )
 
 async def handle_message(update, context):
     text = update.message.text.strip()
