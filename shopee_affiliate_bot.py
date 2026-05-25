@@ -11,6 +11,7 @@ NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
 NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def shorten_url(long_url):
     try:
@@ -23,7 +24,7 @@ def shorten_url(long_url):
         if response.status_code in [200, 201]:
             return response.json().get("link", long_url)
     except Exception as e:
-        print(f"Shortener error: {e}")
+        logger.error(f"Shortener error: {e}")
     return long_url
 
 def convert_to_affiliate_link(original_url):
@@ -35,6 +36,63 @@ def convert_to_affiliate_link(original_url):
     return shorten_url(long_link)
 
 def search_notion(query):
+    logger.info(f"Searching Notion for: {query}")
+    logger.info(f"Database ID: {NOTION_DATABASE_ID}")
+    headers = {
+        "Authorization": f"Bearer {NOTION_TOKEN}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28"
+    }
+    data = {
+        "filter": {
+            "and": [
+                {"property": "Active", "checkbox": {"equals": True}},
+                {
+                    "or": [
+                        {"property": "Product name", "rich_text": {"contains": query}},
+                        {"property": "Catego
+cd ~/Desktop/shopee-bot
+cat > shopee_affiliate_bot.py << 'EOF'
+import logging
+import os
+import requests
+from urllib.parse import quote
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+AFFILIATE_ID = os.environ.get("AFFILIATE_ID")
+BITLY_TOKEN = os.environ.get("BITLY_TOKEN")
+NOTION_TOKEN = os.environ.get("NOTION_TOKEN")
+NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
+
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def shorten_url(long_url):
+    try:
+        response = requests.post(
+            "https://api-ssl.bitly.com/v4/shorten",
+            headers={"Authorization": f"Bearer {BITLY_TOKEN}", "Content-Type": "application/json"},
+            json={"long_url": long_url},
+            timeout=10
+        )
+        if response.status_code in [200, 201]:
+            return response.json().get("link", long_url)
+    except Exception as e:
+        logger.error(f"Shortener error: {e}")
+    return long_url
+
+def convert_to_affiliate_link(original_url):
+    original_url = original_url.strip()
+    if "shopee.sg" not in original_url:
+        return None
+    encoded_url = quote(original_url, safe="")
+    long_link = f"https://s.shopee.sg/an_redir?origin_link={encoded_url}&affiliate_id={AFFILIATE_ID}"
+    return shorten_url(long_link)
+
+def search_notion(query):
+    logger.info(f"Searching Notion for: {query}")
+    logger.info(f"Database ID: {NOTION_DATABASE_ID}")
     headers = {
         "Authorization": f"Bearer {NOTION_TOKEN}",
         "Content-Type": "application/json",
@@ -62,6 +120,8 @@ def search_notion(query):
         json=data,
         timeout=10
     )
+    logger.info(f"Notion response status: {response.status_code}")
+    logger.info(f"Notion response: {response.text[:500]}")
     if response.status_code == 200:
         return response.json().get("results", [])
     return []
