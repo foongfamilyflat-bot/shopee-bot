@@ -13,6 +13,27 @@ NOTION_DATABASE_ID = os.environ.get("NOTION_DATABASE_ID")
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+CATEGORY_MAP = {
+    "home": "01 Home",
+    "kitchen": "02 Kitchen & Cooking",
+    "cooking": "02 Kitchen & Cooking",
+    "fitness": "03 Fitness & Running",
+    "running": "03 Fitness & Running",
+    "beauty": "04 Beauty & Wellness",
+    "wellness": "04 Beauty & Wellness",
+    "skincare": "04 Beauty & Wellness",
+    "fashion": "05 Fashion",
+    "lifestyle": "05 Fashion",
+    "daily": "06 Daily life",
+    "groceries": "07 Groceries & Food",
+    "food": "07 Groceries & Food",
+    "travel": "08 Travel",
+    "content": "09 Content Creation",
+    "cats": "10 Cats",
+    "games": "11 Board & Card Games",
+    "board": "11 Board & Card Games",
+}
+
 def shorten_url(long_url):
     try:
         response = requests.post(
@@ -42,27 +63,34 @@ def search_notion(query):
         "Content-Type": "application/json",
         "Notion-Version": "2022-06-28"
     }
-    data = {
-        "filter": {
-            "and": [
-                {"property": "Active", "checkbox": {"equals": True}},
-                {"or": [
-                    {"property": "Product name", "rich_text": {"contains": query}},
-                    {"property": "Category", "select": {"equals": query.title()}},
-                    {"property": "Sub-category", "select": {"equals": query.title()}},
-                    {"property": "Tags", "multi_select": {"contains": query.lower()}}
-                ]}
-            ]
-        },
-        "page_size": 5
-    }
+    category = CATEGORY_MAP.get(query.lower())
+    if category:
+        data = {
+            "filter": {
+                "and": [
+                    {"property": "Active", "checkbox": {"equals": True}},
+                    {"property": "Category", "select": {"equals": category}}
+                ]
+            },
+            "page_size": 5
+        }
+    else:
+        data = {
+            "filter": {
+                "and": [
+                    {"property": "Active", "checkbox": {"equals": True}},
+                    {"property": "Product name", "rich_text": {"contains": query}}
+                ]
+            },
+            "page_size": 5
+        }
     response = requests.post(
         f"https://api.notion.com/v1/databases/{NOTION_DATABASE_ID}/query",
         headers=headers,
         json=data,
         timeout=10
     )
-    logger.info(f"Notion status: {response.status_code} response: {response.text[:300]}")
+    logger.info(f"Notion status: {response.status_code}")
     if response.status_code == 200:
         return response.json().get("results", [])
     return []
@@ -80,7 +108,7 @@ def format_results(results):
         notes = notes[0].get("plain_text", "") if notes else ""
         if link:
             affiliate = convert_to_affiliate_link(link)
-            line = f"x {name}"
+            line = f"{name}"
             if notes:
                 line += f" - {notes}"
             line += f" {affiliate}"
@@ -106,7 +134,7 @@ async def handle_message(update, context):
     results = search_notion(text)
     formatted = format_results(results)
     if formatted:
-        await update.message.reply_text(f"Here is what I found for {text}: {formatted} Type another keyword to search more!")
+        await update.message.reply_text(f"Here is what I found for {text}:\n\n{formatted}\n\nType another keyword to search more!")
     else:
         await update.message.reply_text(f"No results found for {text}. Try a different keyword or category like home, beauty, cats, kitchen!")
 
