@@ -1,7 +1,6 @@
 import logging
-import random
-import random
 import os
+import random
 import requests
 from urllib.parse import quote
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
@@ -62,8 +61,6 @@ SUBCATEGORY_MAP = {
     "television": "Large appliances",
     "robot vacuum": "Large appliances",
     "washing machine": "Large appliances",
-    "small appliances home": "Small appliances (home)",
-    "small appliances (home)": "Small appliances (home)",
     "fan": "Small appliances (home)",
     "air purifier": "Small appliances (home)",
     "humidifier": "Small appliances (home)",
@@ -72,7 +69,6 @@ SUBCATEGORY_MAP = {
     "diffuser": "Small appliances (home)",
     "storage": "Storage & organisation",
     "organisation": "Storage & organisation",
-    "organization": "Storage & organisation",
     "drawer": "Storage & organisation",
     "organiser": "Storage & organisation",
     "sleep": "Sleep & bedding",
@@ -80,7 +76,6 @@ SUBCATEGORY_MAP = {
     "pillow": "Sleep & bedding",
     "duvet": "Sleep & bedding",
     "sheets": "Sleep & bedding",
-    "mattress": "Sleep & bedding",
     "bath": "Bath & shower",
     "shower": "Bath & shower",
     "towel": "Bath & shower",
@@ -97,14 +92,11 @@ SUBCATEGORY_MAP = {
     "pots": "Cookware",
     "pans": "Cookware",
     "cooking tools": "Cooking tools",
-    "kitchen tools": "Cooking tools",
     "spatula": "Cooking tools",
     "scissors": "Cooking tools",
     "cutting board": "Cooking tools",
     "knives": "Cooking tools",
     "knife": "Cooking tools",
-    "small appliances kitchen": "Small appliances (kitchen)",
-    "small appliances (kitchen)": "Small appliances (kitchen)",
     "rice cooker": "Small appliances (kitchen)",
     "food processor": "Small appliances (kitchen)",
     "food storage": "Food storage",
@@ -113,7 +105,6 @@ SUBCATEGORY_MAP = {
     "air fryer": "Air fryers & grills",
     "airfryer": "Air fryers & grills",
     "grill": "Air fryers & grills",
-    "air fryers": "Air fryers & grills",
     "pantry": "Pantry & condiments",
     "condiments": "Pantry & condiments",
     "sauces": "Pantry & condiments",
@@ -132,18 +123,14 @@ SUBCATEGORY_MAP = {
     "moisturiser": "Skincare",
     "moisturizer": "Skincare",
     "cleanser": "Skincare",
-    "sunscreen": "Skincare",
     "haircare": "Haircare",
     "shampoo": "Haircare",
     "conditioner": "Haircare",
     "hair styler": "Haircare",
-    "hair dryer": "Haircare",
     "makeup": "Makeup",
-    "cosmetics": "Makeup",
     "foundation": "Makeup",
     "blush": "Makeup",
     "concealer": "Makeup",
-    "lip": "Makeup",
     "fragrance": "Fragrance",
     "perfume": "Fragrance",
     "scent": "Fragrance",
@@ -158,20 +145,16 @@ SUBCATEGORY_MAP = {
     "dress": "Tops & dresses",
     "skirts": "Bottoms & skirts",
     "shorts": "Bottoms & skirts",
-    "pants": "Bottoms & skirts",
     "bottoms": "Bottoms & skirts",
     "jacket": "Outerwear",
     "outerwear": "Outerwear",
-    "coat": "Outerwear",
     "winter": "Outerwear",
     "undergarments": "Undergarments",
     "bra": "Undergarments",
     "underwear": "Undergarments",
-    "nipple covers": "Undergarments",
     "bags": "Bags & accessories",
     "accessories": "Bags & accessories",
     "umbrella": "Bags & accessories",
-    "airtag": "Bags & accessories",
     "shoes": "Shoes",
     "slippers": "Shoes",
     "sneakers": "Shoes",
@@ -179,21 +162,16 @@ SUBCATEGORY_MAP = {
     "pyjamas": "Loungewear",
     "pajamas": "Loungewear",
     "homewear": "Loungewear",
-    "home wear": "Loungewear",
     "fresh": "Fresh & frozen",
     "frozen": "Fresh & frozen",
     "salmon": "Fresh & frozen",
     "seafood": "Fresh & frozen",
-    "fish": "Fresh & frozen",
     "drinks": "Drinks & beverages",
     "beverages": "Drinks & beverages",
-    "oat milk": "Drinks & beverages",
     "milk": "Drinks & beverages",
     "cat food": "Cat food",
     "cat accessories": "Cat accessories",
     "scratcher": "Cat accessories",
-    "cat gate": "Cat accessories",
-    "cat camera": "Cat accessories",
     "water fountain": "Cat accessories",
     "cat litter": "Cat litter & hygiene",
     "litter": "Cat litter & hygiene",
@@ -266,10 +244,10 @@ def search_notion(query):
     )
     logger.info(f"Notion status: {response.status_code}")
     if response.status_code == 200:
-            results = response.json().get("results", [])
-            random.shuffle(results)
-            return results[:8]
-        return []
+        results = response.json().get("results", [])
+        random.shuffle(results)
+        return results[:8]
+    return []
 
 def format_results(results):
     if not results:
