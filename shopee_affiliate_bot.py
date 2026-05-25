@@ -266,7 +266,7 @@ def search_notion(query):
     logger.info(f"Notion status: {response.status_code}")
     if response.status_code == 200:
         results = response.json().get("results", [])
-        random.shuffle(results)
+                random.shuffle(results)
         return results[:8]
     return []
 
