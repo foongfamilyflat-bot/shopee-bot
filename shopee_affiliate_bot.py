@@ -1,6 +1,5 @@
 import logging
 import os
-import random
 import requests
 from urllib.parse import quote
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
@@ -62,6 +61,7 @@ SUBCATEGORY_MAP = {
     "robot vacuum": "Large appliances",
     "washing machine": "Large appliances",
     "small appliances home": "Small appliances (home)",
+    "small appliances (home)": "Small appliances (home)",
     "fan": "Small appliances (home)",
     "air purifier": "Small appliances (home)",
     "humidifier": "Small appliances (home)",
@@ -101,6 +101,8 @@ SUBCATEGORY_MAP = {
     "cutting board": "Cooking tools",
     "knives": "Cooking tools",
     "knife": "Cooking tools",
+    "small appliances kitchen": "Small appliances (kitchen)",
+    "small appliances (kitchen)": "Small appliances (kitchen)",
     "rice cooker": "Small appliances (kitchen)",
     "food processor": "Small appliances (kitchen)",
     "food storage": "Food storage",
@@ -251,7 +253,7 @@ def search_notion(query):
                 {"or": or_filters}
             ]
         },
-        "page_size": 20
+        "page_size": 5
     }
 
     response = requests.post(
@@ -262,9 +264,7 @@ def search_notion(query):
     )
     logger.info(f"Notion status: {response.status_code}")
     if response.status_code == 200:
-        results = response.json().get("results", [])
-        random.shuffle(results)
-        return results[:8]
+        return response.json().get("results", [])
     return []
 
 def format_results(results):
