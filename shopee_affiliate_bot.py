@@ -1,4 +1,6 @@
 import logging
+import random
+import random
 import os
 import requests
 from urllib.parse import quote
@@ -253,7 +255,7 @@ def search_notion(query):
                 {"or": or_filters}
             ]
         },
-        "page_size": 5
+        "page_size": 20
     }
 
     response = requests.post(
@@ -264,8 +266,10 @@ def search_notion(query):
     )
     logger.info(f"Notion status: {response.status_code}")
     if response.status_code == 200:
-        return response.json().get("results", [])
-    return []
+            results = response.json().get("results", [])
+            random.shuffle(results)
+            return results[:8]
+        return []
 
 def format_results(results):
     if not results:
