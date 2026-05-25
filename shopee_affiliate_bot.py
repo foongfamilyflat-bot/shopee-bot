@@ -20,7 +20,6 @@ CATEGORY_MAP = {
     "running": "03 Fitness & Running",
     "beauty": "04 Beauty & Wellness",
     "wellness": "04 Beauty & Wellness",
-    "skincare": "04 Beauty & Wellness",
     "fashion": "05 Fashion",
     "lifestyle": "05 Fashion",
     "daily life": "06 Daily life",
@@ -32,11 +31,88 @@ CATEGORY_MAP = {
     "content": "09 Content Creation",
     "cats": "10 Cats",
     "games": "11 Board & Card Games",
-    "board": "11 Board & Card Games",
+    "board games": "11 Board & Card Games",
+    "card games": "11 Board & Card Games",
+}
+
+SUBCATEGORY_MAP = {
+    "homeowner": "Homeowner essentials",
+    "essentials": "Homeowner essentials",
+    "appliances": "Appliances (Home)",
+    "cleaning": "Cleaning & laundry",
+    "laundry": "Cleaning & laundry",
+    "sleep": "Sleep & bed & bath",
+    "bedding": "Sleep & bed & bath",
+    "bath": "Sleep & bed & bath",
+    "bed": "Sleep & bed & bath",
+    "office": "Home office",
+    "home office": "Home office",
+    "storage": "Storage & organisation",
+    "organisation": "Storage & organisation",
+    "organization": "Storage & organisation",
+    "cooking tools": "Cooking essentials/tools",
+    "kitchen tools": "Cooking essentials/tools",
+    "cookware": "Cookware",
+    "pots": "Cookware",
+    "pans": "Cookware",
+    "air fryer": "Air fryers/grills",
+    "airfryer": "Air fryers/grills",
+    "grill": "Air fryers/grills",
+    "food storage": "Food storage",
+    "containers": "Food storage",
+    "sauces": "Sauces & condiments",
+    "condiments": "Sauces & condiments",
+    "seasoning": "Sauces & condiments",
+    "activewear": "Activewear",
+    "sportswear": "Activewear",
+    "workout": "Workout equipment",
+    "equipment": "Workout equipment",
+    "gym": "Workout equipment",
+    "running shoes": "Shoes (fitness)",
+    "sports shoes": "Shoes (fitness)",
+    "skincare": "Skincare",
+    "skin": "Skincare",
+    "serum": "Skincare",
+    "moisturiser": "Skincare",
+    "moisturizer": "Skincare",
+    "makeup": "Makeup",
+    "cosmetics": "Makeup",
+    "hair": "Hair",
+    "haircare": "Hair",
+    "beauty devices": "Beauty devices",
+    "devices": "Beauty devices",
+    "ipl": "Beauty devices",
+    "fragrance": "Fragrance",
+    "perfume": "Fragrance",
+    "scent": "Fragrance",
+    "supplements": "Wellness & supplements",
+    "vitamins": "Wellness & supplements",
+    "outfits": "Outfits",
+    "clothes": "Outfits",
+    "tops": "Outfits",
+    "skirts": "Outfits",
+    "dresses": "Outfits",
+    "undergarments": "Undergarments",
+    "bra": "Undergarments",
+    "underwear": "Undergarments",
+    "bags": "Bags shoes & accessories",
+    "accessories": "Bags shoes & accessories",
+    "home wear": "Comfy home wear",
+    "homewear": "Comfy home wear",
+    "pyjamas": "Comfy home wear",
+    "pajamas": "Comfy home wear",
+    "lounge": "Comfy home wear",
+    "fresh produce": "Fresh produce",
+    "fresh": "Fresh produce",
+    "seafood": "Fresh produce",
+    "fish": "Fresh produce",
+    "pantry": "Pantry",
+    "snacks": "Pantry",
 }
 
 TAG_MAP = {
     "gift idea": "gift idea",
+    "gift": "gift idea",
     "under $20": "under $20",
     "under $50": "under $50",
     "favourite": "favourite",
@@ -67,13 +143,25 @@ def search_notion(query):
         "Notion-Version": "2022-06-28"
     }
     category = CATEGORY_MAP.get(query.lower())
+    subcategory = SUBCATEGORY_MAP.get(query.lower())
     tag = TAG_MAP.get(query.lower())
+
     if category:
         data = {
             "filter": {
                 "and": [
                     {"property": "Active", "checkbox": {"equals": True}},
                     {"property": "Category", "select": {"equals": category}}
+                ]
+            },
+            "page_size": 5
+        }
+    elif subcategory:
+        data = {
+            "filter": {
+                "and": [
+                    {"property": "Active", "checkbox": {"equals": True}},
+                    {"property": "Sub-category", "select": {"equals": subcategory}}
                 ]
             },
             "page_size": 5
@@ -98,6 +186,7 @@ def search_notion(query):
             },
             "page_size": 5
         }
+
     response = requests.post(
         f"https://api.notion.com/v1/databases/{NOTION_DATABASE_ID}/query",
         headers=headers,
