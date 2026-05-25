@@ -72,8 +72,7 @@ def convert_to_affiliate_link(original_url):
     if "shopee.sg" not in original_url:
         return None
     encoded_url = quote(original_url, safe="")
-    long_link = f"https://s.shopee.sg/an_redir?origin_link={encoded_url}&affiliate_id={AFFILIATE_ID}"
-    return shorten_url(long_link)
+    return f"https://s.shopee.sg/an_redir?origin_link={encoded_url}&affiliate_id={AFFILIATE_ID}"
 
 def search_notion(query):
     logger.info(f"Searching Notion for: {query}")
