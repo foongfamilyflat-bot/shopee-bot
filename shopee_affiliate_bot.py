@@ -49,6 +49,8 @@ TAG_MAP = {
     "cat-safe": "cat-safe",
     "currently using": "currently using",
     "hot weather approved": "hot weather approved",
+    "sale": "sale",
+    "voucher": "voucher",
 }
 
 def shorten_url(long_url):
