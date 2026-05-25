@@ -156,12 +156,11 @@ async def start(update, context):
 
 async def help_command(update, context):
     await update.message.reply_text(
-        "*How to use this bot:*\n\n"
-        "*\U0001f50d Browse by category or keyword:*\n"
+        "*Quick reference* \U0001f447\n\n"
+        "*\U0001f50d Browse:* Type a category or keyword\n"
         "`home` \u00b7 `kitchen` \u00b7 `fitness` \u00b7 `beauty` \u00b7 `fashion` \u00b7 `daily life` \u00b7 `groceries` \u00b7 `travel` \u00b7 `content creation` \u00b7 `cats` \u00b7 `games`\n\n"
-        "These are just ideas \u2014 feel free to type anything you're looking for!\n\n"
-        "*\U0001f517 Convert a Shopee link:*\n"
-        "Paste any Shopee URL and I'll generate a fff link for you",
+        "*\U0001f517 Convert:* Paste any Shopee URL to get a fff link\n\n"
+        "Can't find what you're looking for? Try a different keyword!",
         parse_mode="Markdown"
     )
 
