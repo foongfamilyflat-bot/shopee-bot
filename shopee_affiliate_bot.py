@@ -107,11 +107,10 @@ def format_results(results):
         notes = props.get("Notes", {}).get("rich_text", [{}])
         notes = notes[0].get("plain_text", "") if notes else ""
         if link:
-            affiliate = convert_to_affiliate_link(link)
             line = f"{name}"
             if notes:
                 line += f" - {notes}"
-            line += f" {affiliate}"
+            line += f" {link}"
             lines.append(line)
     return "\n\n".join(lines)
 
