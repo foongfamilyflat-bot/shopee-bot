@@ -130,7 +130,7 @@ def format_results(results):
 
 async def start(update, context):
     await update.message.reply_text(
-        "Welcome! Here's how to use this bot 👇
+        "Welcome! Here is how to use this bot 👇
 
 "
         "*🔍 Browse by category or keyword:*
@@ -138,7 +138,7 @@ async def start(update, context):
         "`home` · `kitchen` · `fitness` · `beauty` · `fashion` · `daily life` · `groceries` · `travel` · `content creation` · `cats` · `games`
 
 "
-        "These are just ideas — feel free to type anything you're looking for!
+        "These are just ideas — feel free to type anything you are looking for!
 
 "
         "🏷️ On sale days, type `voucher` to get the latest voucher links!
@@ -146,7 +146,7 @@ async def start(update, context):
 "
         "*🔗 Convert a Shopee link:*
 "
-        "Paste any Shopee URL and I'll generate a fff link for you
+        "Paste any Shopee URL and I will generate a fff link for you
 
 "
         "Try it now! 🛍️",
@@ -169,7 +169,7 @@ async def help_command(update, context):
         "*🔗 Convert:* Paste any Shopee URL to get a fff link
 
 "
-        "Can't find what you're looking for? Try a different keyword!",
+        "Cant find what you are looking for? Try a different keyword!",
         parse_mode="Markdown"
     )
 
