@@ -235,49 +235,26 @@ def search_notion(query):
     subcategory = SUBCATEGORY_MAP.get(query.lower())
     tag = TAG_MAP.get(query.lower())
 
+    or_filters = [
+        {"property": "Product name", "rich_text": {"contains": query}},
+        {"property": "Notes", "rich_text": {"contains": query}},
+    ]
     if category:
-        data = {
-            "filter": {
-                "and": [
-                    {"property": "Active", "checkbox": {"equals": True}},
-                    {"property": "Category", "select": {"equals": category}}
-                ]
-            },
-            "page_size": 5
-        }
-    elif subcategory:
-        data = {
-            "filter": {
-                "and": [
-                    {"property": "Active", "checkbox": {"equals": True}},
-                    {"property": "Sub-category", "multi_select": {"contains": subcategory}}
-                ]
-            },
-            "page_size": 5
-        }
-    elif tag:
-        data = {
-            "filter": {
-                "and": [
-                    {"property": "Active", "checkbox": {"equals": True}},
-                    {"property": "Tags", "multi_select": {"contains": tag}}
-                ]
-            },
-            "page_size": 5
-        }
-    else:
-        data = {
-            "filter": {
-                "and": [
-                    {"property": "Active", "checkbox": {"equals": True}},
-                    {"or": [
-                        {"property": "Product name", "rich_text": {"contains": query}},
-                        {"property": "Notes", "rich_text": {"contains": query}}
-                    ]}
-                ]
-            },
-            "page_size": 5
-        }
+        or_filters.append({"property": "Category", "select": {"equals": category}})
+    if subcategory:
+        or_filters.append({"property": "Sub-category", "multi_select": {"contains": subcategory}})
+    if tag:
+        or_filters.append({"property": "Tags", "multi_select": {"contains": tag}})
+
+    data = {
+        "filter": {
+            "and": [
+                {"property": "Active", "checkbox": {"equals": True}},
+                {"or": or_filters}
+            ]
+        },
+        "page_size": 5
+    }
 
     response = requests.post(
         f"https://api.notion.com/v1/databases/{NOTION_DATABASE_ID}/query",
